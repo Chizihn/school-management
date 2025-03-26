@@ -18,6 +18,7 @@ interface StudentStore {
   updateLoading: boolean;
   initialized: boolean;
   error: string | null;
+  setStudents: (students: Student[]) => void;
   fetchStudents: (classId: string, sessionId: string) => Promise<void>;
   fetchStudent: (id: string) => Promise<void>;
   registerStudent: (formData: StudentInput) => Promise<string | null>;
@@ -33,11 +34,14 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
   updateLoading: false,
   initialized: false,
   error: null,
+  setStudents: (newStudents) => set({ students: newStudents }),
 
   // Fetch all students for a specific class and session
   fetchStudents: async (classId: string, sessionId: string) => {
     set({ loading: true, error: null });
     try {
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
       const response = await client.query({
         query: GET_STUDENTS,
         variables: { classId, sessionId },

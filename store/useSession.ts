@@ -37,6 +37,8 @@ export const useSessionStore = create<SessionStore>((set) => ({
   fetchSessions: async () => {
     set({ loading: true, error: null });
     try {
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
       const response = await client.query({
         query: GET_SESSIONS,
         fetchPolicy: "network-only",

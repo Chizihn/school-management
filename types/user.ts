@@ -1,5 +1,4 @@
-import { Session } from "inspector/promises";
-import { Class, Result, Subject } from "./school";
+import { Class, Result, Session, Subject } from "./school";
 
 // Enum for gender
 export enum Gender {

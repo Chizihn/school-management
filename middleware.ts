@@ -9,7 +9,7 @@ export function middleware(req: NextRequest) {
   if (!token) {
     console.warn("No authentication found. Redirecting to /login.");
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", pathname); // Preserve original path
+    loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 

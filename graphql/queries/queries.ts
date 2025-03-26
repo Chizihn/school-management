@@ -12,12 +12,6 @@ export const GET_STUDENTS = gql`
       lastName
       gender
       regNo
-      guardian {
-        id
-        name
-        email
-        phone
-      }
     }
   }
 `;

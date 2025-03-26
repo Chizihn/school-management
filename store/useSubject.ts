@@ -42,6 +42,8 @@ export const useSubjectStore = create<SubjectStore>((set) => ({
   fetchSubjects: async () => {
     set({ loading: true, error: null });
     try {
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
       const response = await client.query({
         query: GET_SUBJECTS,
         fetchPolicy: "network-only",

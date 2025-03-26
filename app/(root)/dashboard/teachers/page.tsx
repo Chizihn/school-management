@@ -1,6 +1,6 @@
 // components/AllTeachersPage.js
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Search, Filter, Download, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,41 +13,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTeacherStore } from "@/store/useTeacher";
+import { PageLoading } from "@/components/Loader";
 
 const AllTeachersPage = () => {
-  const teachers = [
-    {
-      id: "1",
-      firstName: "Dr. Sarah",
-      lastName: "Johnson",
-      email: "sarah.johnson@example.com",
-      phone: "123-456-7890",
-      role: "teacher",
-      gender: "female",
-      createdAt: "2024-01-12",
-      updatedAt: "2024-01-12",
-      subjects: [
-        {
-          id: "math-01",
-          name: "Mathematics",
-          code: "MATH101",
-          createdAt: "2024-01-01",
-          updatedAt: "2024-01-01",
-        },
-      ],
-      classes: [
-        {
-          id: "class-01",
-          name: "Math 101",
-          level: "Beginner",
-          createdAt: "2024-01-01",
-          updatedAt: "2024-01-01",
-        },
-      ],
-    },
-    // Add other teachers with their subject and class details as per your data
-  ];
+  const { teachers, loading, error, fetchTeachers } = useTeacherStore();
 
+  useEffect(() => {
+    fetchTeachers();
+  }, [fetchTeachers]);
+
+  if (loading) return <PageLoading />;
+
+  if (error)
+    return (
+      <div>
+        <p>Error: {error}</p>
+      </div>
+    );
+
+  if (!loading && !teachers)
+    return (
+      <div>
+        <p>No teacher found</p>
+      </div>
+    );
   return (
     <Card>
       <CardContent className="pt-6">
@@ -81,14 +71,14 @@ const AllTeachersPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {teachers.map((teacher) => (
+              {teachers?.map((teacher) => (
                 <TableRow key={teacher.id}>
                   <TableCell className="font-medium">{`${teacher.firstName} ${teacher.lastName}`}</TableCell>
                   <TableCell>
-                    {teacher.subjects.map((sub) => sub.name).join(", ")}
+                    {teacher.subjects?.map((sub) => sub.name).join(", ")}
                   </TableCell>
                   <TableCell>
-                    {teacher.classes.map((cls) => cls.name).join(", ")}
+                    {teacher.classes?.map((cls) => cls.name).join(", ")}
                   </TableCell>
                   <TableCell>{teacher.createdAt}</TableCell>
                   <TableCell>

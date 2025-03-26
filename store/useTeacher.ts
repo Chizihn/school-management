@@ -37,6 +37,9 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
   fetchTeachers: async () => {
     set({ loading: true, error: null });
     try {
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
+
       const response = await client.query({
         query: GET_TEACHERS,
         fetchPolicy: "network-only",
@@ -190,6 +193,4 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
       set({ loading: false });
     }
   },
-
-  
 }));

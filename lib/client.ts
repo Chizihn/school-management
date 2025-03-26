@@ -12,7 +12,7 @@ import {
 const authLink = new ApolloLink((operation, forward) => {
   const cookieToken = cookieStorage.getItem("token") as string;
   const storeToken = useAuthStore.getState().token as string;
-  const token = cookieToken || storeToken;
+  const token = cookieToken || storeToken || "";
 
   if (token && isTokenExpired(token)) {
     useAuthStore.getState().logout();

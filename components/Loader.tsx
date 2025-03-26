@@ -38,7 +38,7 @@ const Loader = () => {
 
 const PageLoading = () => {
   return (
-    <div className="h-72 flex justify-center items-center">
+    <div className="h-80 flex justify-center items-center">
       <Loader />
     </div>
   );

@@ -9,7 +9,6 @@ import {
   Settings,
   FileText,
   Sparkles,
-  Menu,
   X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -62,8 +61,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       icon: <Users size={20} />,
       path: "/dashboard/teachers",
       subItems: [
-        { title: "All teachers", path: "/teachers" },
-        { title: "Add teacher", path: "/teachers/add" },
+        { title: "All teachers", path: "/dashboard/teachers" },
+        { title: "Add teacher", path: "/dashboard/teachers/add" },
       ],
     },
     {
@@ -71,7 +70,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       icon: <GraduationCap size={20} />,
       path: "/dashboard/students",
       subItems: [
-        { title: "All students", path: "/dashboard/students/all" },
+        { title: "All students", path: "/dashboard/students" },
         { title: "Admission form", path: "/dashboard/students/admission" },
         { title: "Student promotion", path: "/dashboard/students/promotion" },
         { title: "Class", path: "/dashboard/students/class" },
@@ -108,16 +107,6 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
   return (
     <>
-      {/* Mobile hamburger menu */}
-      <div className="lg:hidden flex items-center p-2">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-md hover:bg-blue-900 text-white"
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
       {/* Sidebar */}
       <div
         className={`${
@@ -135,9 +124,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             <div key={index} className="px-2 py-1">
               <div
                 className={`flex items-center justify-between p-2 rounded-md cursor-pointer hover:bg-blue-900 ${
-                  pathname.startsWith(`${pathname.startsWith(`${item.path}`)}`)
-                    ? "bg-blue-800"
-                    : ""
+                  pathname.startsWith(item.path) ? "bg-blue-800" : ""
                 }`}
                 onClick={() =>
                   item.subItems ? toggleExpand(item.title) : null
@@ -183,10 +170,15 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
       {/* Overlay for mobile */}
       {isOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
-          onClick={toggleSidebar}
-        />
+        <>
+          <div className="lg:hidden fixed inset-0 bg-black bg-opacity-10 z-5" />
+          <button
+            className="flex lg:hidden absolute top-10 right-10 text-white z-[1002] cursor-pointer"
+            onClick={toggleSidebar}
+          >
+            <X size={28} />
+          </button>
+        </>
       )}
     </>
   );

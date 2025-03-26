@@ -45,6 +45,8 @@ export const useClassStore = create<ClassStore>((set) => ({
   fetchClasses: async () => {
     set({ loading: true, error: null });
     try {
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
       const response = await client.query({
         query: GET_CLASSES,
         fetchPolicy: "network-only",
