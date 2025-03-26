@@ -14,9 +14,7 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-// import Image from "next/image"; // Import Image from next/image
 
-// Define types for menu items and subItems
 interface SubMenuItem {
   title: string;
   path: string;
@@ -30,7 +28,6 @@ interface MenuItem {
   isNew?: boolean;
 }
 
-// Define types for the component state
 interface ExpandedItems {
   [key: string]: boolean;
 }
@@ -47,11 +44,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<ExpandedItems>({});
 
-  // Use useCallback to memoize the toggleExpand function
   const toggleExpand = useCallback((key: string) => {
     setExpandedItems((prev) => ({
       ...prev,
-      [key]: !prev[key], // Toggle the state for the selected menu item
+      [key]: !prev[key],
     }));
   }, []);
 
@@ -64,39 +60,38 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     {
       title: "Teachers",
       icon: <Users size={20} />,
-      path: "/teachers",
+      path: "/dashboard/teachers",
       subItems: [
         { title: "All teachers", path: "/teachers" },
         { title: "Add teacher", path: "/teachers/add" },
-        // { title: "Teachers details", path: "/teachers/details" },
       ],
     },
     {
       title: "Students/Classes",
       icon: <GraduationCap size={20} />,
-      path: "/students",
+      path: "/dashboard/students",
       subItems: [
-        { title: "All students", path: "/students/all" },
-        { title: "Admission form", path: "/students/admission" },
-        { title: "Student promotion", path: "/students/promotion" },
-        { title: "Class", path: "/students/class" },
+        { title: "All students", path: "/dashboard/students/all" },
+        { title: "Admission form", path: "/dashboard/students/admission" },
+        { title: "Student promotion", path: "/dashboard/students/promotion" },
+        { title: "Class", path: "/dashboard/students/class" },
       ],
     },
     {
       title: "Billing",
       icon: <CreditCard size={20} />,
-      path: "/billing",
+      path: "/dashboard/billing",
       subItems: [
-        { title: "Student Billing", path: "/billing/student" },
-        { title: "Parent Billing", path: "/billing/parent" },
-        { title: "School Billing", path: "/billing/school" },
-        { title: "Friend Billing", path: "/billing/friend" },
+        { title: "Student Billing", path: "/dashboard/billing/student" },
+        { title: "Parent Billing", path: "/dashboard/billing/parent" },
+        { title: "School Billing", path: "/dashboard/billing/school" },
+        { title: "Friend Billing", path: "/dashboard/billing/friend" },
       ],
     },
     {
       title: "Settings and profile",
       icon: <Settings size={20} />,
-      path: "/settings",
+      path: "/dashboard/settings",
     },
     {
       title: "Exams",
@@ -106,7 +101,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     {
       title: "Features",
       icon: <Sparkles size={20} />,
-      path: "/features",
+      path: "/dashboard/features",
       isNew: true,
     },
   ];
@@ -131,15 +126,6 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       >
         {/* Logo */}
         <div className="flex items-center justify-center p-4 border-b border-blue-900">
-          {/* <div className="bg-white rounded-full p-1 mr-2">
-            <Image
-              src="/api/placeholder/40/40"
-              alt="Logo"
-              width={32} // You can adjust the width and height as needed
-              height={32}
-              className="rounded-full"
-            />
-          </div> */}
           <div className="text-lg font-semibold">Udemy school</div>
         </div>
 
@@ -149,7 +135,9 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             <div key={index} className="px-2 py-1">
               <div
                 className={`flex items-center justify-between p-2 rounded-md cursor-pointer hover:bg-blue-900 ${
-                  pathname.startsWith(`${item.path}`) ? "bg-blue-800" : ""
+                  pathname.startsWith(`${pathname.startsWith(`${item.path}`)}`)
+                    ? "bg-blue-800"
+                    : ""
                 }`}
                 onClick={() =>
                   item.subItems ? toggleExpand(item.title) : null

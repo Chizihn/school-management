@@ -1,6 +1,5 @@
 "use client";
 import React, { ReactNode, useState } from "react";
-// import { X, Menu } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { Menu, X } from "lucide-react";
 
@@ -22,7 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Main content area */}
       <div
-        className={`flex-grow p-4 overflow-auto transition-all duration-300 ${
+        className={`flex-grow p-4 overflow-auto transition-all duration-300 bg-red-500 ${
           isOpen ? "ml-64" : "ml-0"
         }`} // Add margin-left when sidebar is open
       >

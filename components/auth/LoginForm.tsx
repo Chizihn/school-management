@@ -1,25 +1,27 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-// import { useAuthStore } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
 import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
+import { FullPageLoading } from "../Loader";
 
 const Login = () => {
-  //   const router = useRouter();
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
+  const [pageLoading, setPageLoading] = useState<boolean>(false);
 
-  //   const { login } = useAuthStore();
+  const { login } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -27,12 +29,12 @@ const Login = () => {
       ...prev,
       [id]: value,
     }));
-    setErrors((prev) => ({ ...prev, [id]: "" })); // Clear error on input change
+    setErrors((prev) => ({ ...prev, [id]: "" }));
   };
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
-    if (!formData.email) newErrors.email = "Email is required.";
+    if (!formData.identifier) newErrors.email = "An identifier is required.";
     if (!formData.password) newErrors.password = "Password is required.";
     return newErrors;
   };
@@ -48,29 +50,28 @@ const Login = () => {
 
     setIsSubmitting(true);
 
+    const loginData = {
+      identifier: formData.identifier,
+      password: formData.password,
+    };
+
     try {
-      //   const response = await login({
-      //     email: formData.email,
-      //     password: formData.password,
-      //   });
-      //   if (response && response.success) {
-      //     toast.success("Login successful!");
-      //     router.push("/");
-      //   } else {
-      //     toast.error(
-      //       response?.message || "Login failed. Please check your credentials."
-      //     );
-      //   }
+      const response = await login(loginData);
+      if (response) {
+        toast.success("Login successful!");
+        router.push("/dashboard");
+        setPageLoading(true);
+      } else {
+        toast.error("Login failed. Please check your credentials.");
+      }
     } catch (error) {
-      toast.error(
-        (error as Error).message ||
-          "Login failed. Please check your credentials."
-      );
+      toast.error((error as Error).message || "Error logging in");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (pageLoading) return <FullPageLoading />;
   return (
     <div className="flex justify-center items-center min-h-screen ">
       <Card className="w-full max-w-md shadow-lg rounded-lg">
@@ -86,15 +87,15 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
-                htmlFor="email"
+                htmlFor="text"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email
+                Identifier
               </label>
               <input
-                id="email"
-                type="email"
-                value={formData.email}
+                id="identifier"
+                type="identifier"
+                value={formData.identifier}
                 onChange={handleChange}
                 className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.email ? "border-red-500" : "border-gray-300"

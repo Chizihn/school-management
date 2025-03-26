@@ -1,9 +1,9 @@
 import TeacherDetails from "@/components/TeacherDetails";
 
 interface TeacherDetailsPageProps {
-  params: {
-    id: string; // `id` is directly a string, not a Promise
-  };
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 export default async function TeacherDetailsPage({
