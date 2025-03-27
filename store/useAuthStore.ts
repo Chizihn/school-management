@@ -4,6 +4,7 @@ import { LoginSchema } from "@/types/auth";
 import { User } from "@/types/user";
 import { errorHandler } from "@/utils/error";
 import { cookieStorage } from "@/utils/session";
+import { toast } from "react-toastify";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -49,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
           });
 
           if (response.data?.login?.token && response.data.login?.user) {
+            toast.success("Login success!");
             const { token, user } = response.data.login;
             console.log("user", response.data.login);
 
@@ -62,10 +64,13 @@ export const useAuthStore = create<AuthState>()(
             });
             return true;
           } else {
+            toast.error("Invalid credentials");
             throw new Error("Invalid login data");
           }
         } catch (error) {
           const errorMessage = errorHandler(error);
+
+          toast.error(errorMessage);
 
           set({
             error: errorMessage,
