@@ -16,9 +16,10 @@ const Login = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {}
-  );
+  const [errors, setErrors] = useState<{
+    identifier?: string;
+    password?: string;
+  }>({});
   const [pageLoading, setPageLoading] = useState<boolean>(false);
 
   const { login } = useAuthStore();
@@ -74,7 +75,7 @@ const Login = () => {
   if (pageLoading) return <FullPageLoading />;
   return (
     <div className="flex justify-center items-center min-h-screen ">
-      <Card className="w-full max-w-md shadow-lg rounded-lg">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
             Welcome, log in to your account
@@ -97,13 +98,13 @@ const Login = () => {
                 type="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.email ? "border-red-500" : "border-gray-300"
+                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.identifier ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="you@example.com"
               />
-              {errors.email && (
-                <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+              {errors.identifier && (
+                <p className="text-sm text-red-500 mt-1">{errors.identifier}</p>
               )}
             </div>
 
@@ -119,10 +120,10 @@ const Login = () => {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.password ? "border-red-500" : "border-gray-300"
                 }`}
-                placeholder="••••••••"
+                placeholder=""
               />
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">{errors.password}</p>

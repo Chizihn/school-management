@@ -1,11 +1,11 @@
-// components/AddTeacherPage.js
 "use client";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTeacherStore } from "@/store/useTeacher";
 
-const AddTeacherPage = () => {
+const AddTeacherPage: React.FC = () => {
   const [teacher, setTeacher] = useState({
     firstName: "",
     lastName: "",
@@ -15,6 +15,11 @@ const AddTeacherPage = () => {
     classes: [],
   });
 
+  const { teacherLoading, error } = useTeacherStore();
+
+  // Fetch teacher details when component mounts or id
+
+  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTeacher((prev) => ({
@@ -23,11 +28,22 @@ const AddTeacherPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle submission (e.g., send data to API)
-    console.log("New Teacher", teacher);
+    // Add your logic to submit the updated teacher details
+    console.log("Updated Teacher", teacher);
+    // Example: call API to update the teacher's data
+    // await updateTeacher(teacher);
   };
+
+  if (teacherLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading teacher details: {error}</div>;
+  }
 
   return (
     <Card>
@@ -35,12 +51,13 @@ const AddTeacherPage = () => {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Full Name</label>
+              <label className="text-sm font-medium">First Name</label>
               <Input
                 name="firstName"
                 placeholder="Enter first name"
                 value={teacher.firstName}
                 onChange={handleInputChange}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -50,6 +67,7 @@ const AddTeacherPage = () => {
                 placeholder="Enter last name"
                 value={teacher.lastName}
                 onChange={handleInputChange}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -60,6 +78,7 @@ const AddTeacherPage = () => {
                 placeholder="Enter email address"
                 value={teacher.email}
                 onChange={handleInputChange}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -69,10 +88,14 @@ const AddTeacherPage = () => {
                 placeholder="Enter phone number"
                 value={teacher.phone}
                 onChange={handleInputChange}
+                required
               />
             </div>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">Submit</Button>
+
+          <Button className="bg-blue-600 hover:bg-blue-700" type="submit">
+            {teacherLoading ? "Submitting..." : "Submit"}
+          </Button>
         </form>
       </CardContent>
     </Card>

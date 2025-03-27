@@ -85,6 +85,8 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
           ? state.teachers.map((t) => (t.id === id ? fetchedTeacher : t))
           : [...state.teachers, fetchedTeacher],
       }));
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
     } catch (error) {
       console.error("Error in fetchTeacher:", error);
       set({
@@ -181,6 +183,9 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
         teachers: state.teachers.filter((teacher) => teacher.id !== id),
         teacher: state.teacher?.id === id ? null : state.teacher,
       }));
+
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
 
       return true;
     } catch (error) {

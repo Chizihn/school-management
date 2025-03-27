@@ -51,7 +51,7 @@ export const StudentFilters: React.FC<StudentFiltersProps> = ({
     <div className="flex flex-col sm:flex-row justify-between gap-4">
       <div className="flex gap-4 w-full">
         <Select value={selectedClassId || ""} onValueChange={onClassSelect}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="p-6 w-full ">
             <SelectValue placeholder="Select Class" />
           </SelectTrigger>
           <SelectContent>
@@ -64,7 +64,7 @@ export const StudentFilters: React.FC<StudentFiltersProps> = ({
         </Select>
 
         <Select value={selectedSessionId || ""} onValueChange={onSessionSelect}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="py-6 w-full">
             <SelectValue placeholder="Select Session" />
           </SelectTrigger>
           <SelectContent>
