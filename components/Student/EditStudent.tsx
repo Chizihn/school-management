@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useStudentStore } from "@/store/useStudent";
 import { Gender } from "@/types/user";
 import { toast } from "react-toastify";
+import CustomSelect from "../ui/CustomSelect";
+import { capitalizeFirstChar } from "@/utils";
 
 interface EditStudentPageProps {
   id: string;
@@ -79,75 +81,76 @@ const EditStudentPage: React.FC<EditStudentPageProps> = ({ id }) => {
   }
 
   return (
-    <Card className="w-full max-w-5xl mx-auto shadow-none ">
-      <CardContent>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">First Name</label>
-              <Input
-                name="firstName"
-                placeholder="Enter first name"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+    <>
+      <Card className="w-full max-w-5xl mx-auto shadow-none ">
+        <CardContent>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">First Name</label>
+                <Input
+                  name="firstName"
+                  placeholder="Enter first name"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Last Name</label>
-              <Input
-                name="lastName"
-                placeholder="Enter last name"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Last Name</label>
+                <Input
+                  name="lastName"
+                  placeholder="Enter last name"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Date of Birth</label>
-              <Input
-                type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Gender</label>
-              <select
-                name="gender"
+              <CustomSelect
+                options={Object.values(Gender).map((gender) => ({
+                  label: capitalizeFirstChar(gender),
+                  value: gender,
+                }))}
                 value={formData.gender}
-                onChange={(e) =>
+                onChange={(value) =>
                   setFormData((prev) => ({
                     ...prev,
-                    gender: e.target.value as Gender,
+                    gender: value as Gender,
                   }))
                 }
-                className="w-full p-2 border rounded"
-              >
-                {Object.values(Gender).map((gender) => (
-                  <option key={gender} value={gender}>
-                    {gender.charAt(0).toUpperCase() + gender.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+                label="Gender"
+                placeholder="Select Gender"
+                className="w-full"
+                changeBg="white"
+                searchable={false}
+                clearable={false}
+              />
 
-          <Button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700"
-            disabled={localLoading || loading}
-          >
-            {localLoading || loading ? "Updating..." : "Update Student"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Date of Birth</label>
+                <Input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700"
+              disabled={localLoading || loading}
+            >
+              {localLoading || loading ? "Updating..." : "Update Student"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

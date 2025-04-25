@@ -1,247 +1,231 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// components/ui/custom-select.tsx
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from "@/components/ui/select";
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Control } from "react-hook-form";
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronDown, X } from "lucide-react";
+import { capitalizeFirstChar } from "@/utils";
 
-export type SelectOption = {
-  value: string;
+interface SelectOption {
   label: string;
-  disabled?: boolean;
-};
+  value: string | number;
+  [key: string]: unknown;
+}
 
-export type SelectGroup = {
-  label: string;
+interface SelectProps {
   options: SelectOption[];
-};
-
-type CustomSelectProps = {
-  options: SelectOption[] | SelectGroup[];
+  value: string | number | null;
+  onChange: (value: string | number | null) => void;
   placeholder?: string;
-  name: string;
-  label?: string;
-  description?: string;
   disabled?: boolean;
-  required?: boolean;
   className?: string;
-  control?: Control<any>;
-  onChange?: (value: string) => void;
-  value?: string;
+  label?: string;
   error?: string;
-  size?: "default" | "sm" | "lg";
-  isGrouped?: boolean;
-};
+  required?: boolean;
+  searchable?: boolean;
+  clearable?: boolean;
+  showScrollbar?: boolean;
+  loading?: boolean;
+  changeBg?: "default" | "white" | "transparent"; // New prop for background
+  [key: string]: unknown;
+}
 
-export const CustomSelect = ({
+const CustomSelect: React.FC<SelectProps> = ({
   options,
-  placeholder = "Select an option",
-  name,
-  label,
-  description,
-  disabled = false,
-  required = false,
-  className,
-  control,
-  onChange,
   value,
-  error,
-  size = "default",
-  isGrouped = false,
-}: CustomSelectProps) => {
-  // Determine if we're using grouped options
-  const isGroupedOptions =
-    isGrouped ||
-    ("label" in (options[0] || {}) && "options" in (options[0] || {}));
+  onChange,
+  placeholder = "Select an option",
+  disabled = false,
+  className = "",
+  label,
+  required = false,
+  searchable = false,
+  clearable = false,
+  showScrollbar = true, // New prop for scrollbar
+  loading = false,
+  changeBg = "default", // Default value
+  ...props
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const selectRef = useRef<HTMLDivElement>(null);
+  const selectedOptionRef = useRef<HTMLLIElement>(null);
 
-  // Handle size variations
-  const sizeClasses = {
-    sm: "h-8 text-xs",
-    default: "h-10 text-sm",
-    lg: "h-12 text-base",
+  // Background styles based on the changeBg prop
+  const getBgStyles = () => {
+    switch (changeBg) {
+      case "white":
+        return "bg-white border-1 ";
+      case "transparent":
+        return "bg-transparent hover:bg-gray-50/10";
+      default:
+        return "bg-slate-100 hover:bg-slate-200";
+    }
   };
 
-  // If using react-hook-form
-  if (control) {
-    return (
-      <FormField
-        control={control}
-        name={name}
-        render={({ field }) => (
-          <FormItem>
-            {label && (
-              <FormLabel
-                className={
-                  required
-                    ? "after:content-['*'] after:ml-0.5 after:text-red-500"
-                    : ""
-                }
-              >
-                {label}
-              </FormLabel>
-            )}
-            <FormControl>
-              <Select
-                disabled={disabled}
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <SelectTrigger className={cn(sizeClasses[size], className)}>
-                  <SelectValue placeholder={placeholder} />
-                </SelectTrigger>
-                <SelectContent>
-                  {isGroupedOptions
-                    ? (options as SelectGroup[]).map((group, groupIndex) => (
-                        <SelectGroup key={`group-${groupIndex}`}>
-                          <SelectLabel>{group.label}</SelectLabel>
-                          {group.options.map((option) => (
-                            <SelectItem
-                              key={option.value}
-                              value={option.value}
-                              disabled={option.disabled}
-                            >
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      ))
-                    : (options as SelectOption[]).map((option) => (
-                        <SelectItem
-                          key={option.value}
-                          value={option.value}
-                          disabled={option.disabled}
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-            {description && <FormDescription>{description}</FormDescription>}
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    );
-  }
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
 
-  // If using without react-hook-form
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && selectedOptionRef.current) {
+      selectedOptionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [isOpen]);
+
+  const toggleDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
+    if (!disabled || !loading) {
+      setIsOpen((prev) => !prev);
+      setSearchTerm("");
+    }
+  };
+
+  const handleSelect = (selectedValue: string | number) => {
+    if (disabled) return;
+    onChange(selectedValue);
+    setIsOpen(false);
+  };
+
+  const clearSelection = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(null);
+  };
+
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const selectedOption = options.find((option) => option.value === value);
+
   return (
-    <div className="space-y-2">
+    <div
+      className={`flex flex-col gap-1.5 ${
+        showScrollbar ? "" : "scrollbar-none"
+      } ${className}`}
+      ref={selectRef}
+      {...props}
+    >
       {label && (
-        <label
-          htmlFor={name}
-          className={cn(
-            "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-            required
-              ? "after:content-['*'] after:ml-0.5 after:text-red-500"
-              : ""
-          )}
-        >
-          {label}
+        <label className="text-sm lg:text-md font-medium ">
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <Select disabled={disabled} onValueChange={onChange} value={value}>
-        <SelectTrigger id={name} className={cn(sizeClasses[size], className)}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {isGroupedOptions
-            ? (options as SelectGroup[]).map((group, groupIndex) => (
-                <SelectGroup key={`group-${groupIndex}`}>
-                  <SelectLabel>{group.label}</SelectLabel>
-                  {group.options.map((option) => (
-                    <SelectItem
-                      key={option.value}
-                      value={option.value}
-                      disabled={option.disabled}
-                    >
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))
-            : (options as SelectOption[]).map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </SelectItem>
-              ))}
-        </SelectContent>
-      </Select>
-      {description && (
-        <p className="text-sm text-muted-foreground">{description}</p>
-      )}
-      {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+      <div className="relative w-full">
+        <div
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-controls="select-dropdown"
+          className={`
+            w-full px-4 py-2 border rounded-md
+            focus:outline-none focus:ring-2 focus:ring-gray-200
+            transition-colors
+            flex items-center justify-between cursor-pointer ${
+              showScrollbar ? "" : "scrollbar-none"
+            }
+            ${getBgStyles()}
+            ${disabled ? "bg-gray-200 cursor-not-allowed" : ""}
+          `}
+          onClick={toggleDropdown}
+          tabIndex={disabled ? -1 : 0}
+        >
+          {loading ? (
+            <div className=" w-full flex justify-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
+            </div>
+          ) : (
+            <span className="truncate text-md text-gray-500">
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
+          )}
+
+          <div className="flex gap-2 items-center">
+            {clearable && selectedOption && (
+              <X
+                size={20}
+                className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                onClick={clearSelection}
+              />
+            )}
+            <ChevronDown
+              size={20}
+              className={`text-gray-600 transform transition-transform duration-200 ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
+          </div>
+        </div>
+
+        {isOpen && (
+          <div
+            id="select-dropdown"
+            role="listbox"
+            className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+          >
+            {searchable && (
+              <div className="p-2">
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary outline-none"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            )}
+            <ul className={`py-1 ${showScrollbar ? "" : "scrollbar-none"}`}>
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => (
+                  <li
+                    key={option.value}
+                    ref={option.value === value ? selectedOptionRef : null}
+                    role="option"
+                    aria-selected={option.value === value}
+                    className={`px-4 py-2 cursor-pointer select-none
+                      ${
+                        option.value === value
+                          ? "bg-gray-200 text-gray-700"
+                          : "text-gray-500"
+                      }
+                      ${disabled ? "cursor-not-allowed" : "hover:bg-gray-100"}`}
+                    onClick={() => handleSelect(option.value)}
+                  >
+                    {capitalizeFirstChar(option.label)}
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-3 text-gray-500 text-center">
+                  No options found
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-// Example usage
-// export const SelectExample = () => {
-//   const [value, setValue] = React.useState("");
-
-//   const options = [
-//     { value: "apple", label: "Apple" },
-//     { value: "banana", label: "Banana" },
-//     { value: "orange", label: "Orange", disabled: true },
-//   ];
-
-//   const groupedOptions = [
-//     {
-//       label: "Fruits",
-//       options: [
-//         { value: "apple", label: "Apple" },
-//         { value: "banana", label: "Banana" },
-//       ],
-//     },
-//     {
-//       label: "Vegetables",
-//       options: [
-//         { value: "carrot", label: "Carrot" },
-//         { value: "broccoli", label: "Broccoli" },
-//       ],
-//     },
-//   ];
-
-//   return (
-//     <div className="space-y-4">
-//       <CustomSelect
-//         name="basic-select"
-//         label="Select a fruit"
-//         description="Choose your favorite fruit"
-//         options={options}
-//         value={value}
-//         onChange={setValue}
-//         required
-//       />
-
-//       <CustomSelect
-//         name="grouped-select"
-//         label="Grouped example"
-//         options={groupedOptions}
-//         isGrouped
-//         size="lg"
-//       />
-//     </div>
-//   );
-// };
+export default CustomSelect;

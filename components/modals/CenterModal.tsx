@@ -116,7 +116,6 @@ const CenterModal: React.FC<CenterModalProps> = ({
         role="dialog"
       >
         {/* Modal Content */}
-        {/* Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl w-full max-h-screen h-full overflow-hidden lg:w-full lg:max-w-4xl lg:h-[95vh]l
           transition-all duration-300 ${
@@ -139,10 +138,7 @@ const CenterModal: React.FC<CenterModalProps> = ({
           </div>
 
           {/* Scrollable content */}
-          <div className=" h-full w-full flex-1 overflow-auto ">
-            {/* p-2 lg:p-6 pb-[4rem] lg:pb-0 */}
-            {children}
-          </div>
+          <div className=" h-full w-full flex-1 overflow-auto ">{children}</div>
         </div>
       </div>
     </>

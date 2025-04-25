@@ -58,7 +58,7 @@ export interface Subject {
   updatedAt: string;
 }
 
-// =====================================Class=====================================
+// ======================================Class=====================================
 
 //For add class mutation
 export interface ClassInput {
@@ -73,10 +73,10 @@ export interface UpdateClassInput {
 }
 
 export enum ClassLevel {
-  NUSERY = "NUSERY",
-  PRIMARY = "PRIMARY",
-  JUNIOR_SECONDARY = "JUNIOR_SECONDARY",
-  SENIOR_SECONDARY = "SENIOR_SECONDARY",
+  NUSERY = "Nursery",
+  PRIMARY = "Primary",
+  JUNIOR_SECONDARY = "Junior Secondary",
+  SENIOR_SECONDARY = "Senior Secondary",
 }
 
 export interface Class {

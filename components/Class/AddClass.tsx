@@ -8,12 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ClassLevel } from "@/types/school";
 import { toast } from "react-toastify";
 import { useClassStore } from "@/store/useClass";
+import CustomSelect from "../ui/CustomSelect";
 
 const AddClassPage: React.FC = () => {
   const { createClass, loading } = useClassStore();
   const [formData, setFormData] = useState({
     name: "",
-    level: ClassLevel.PRIMARY, // Default class level
+    level: ClassLevel.NUSERY, // Default class level
   });
 
   const [localLoading, setLocalLoading] = useState(false);
@@ -52,13 +53,10 @@ const AddClassPage: React.FC = () => {
     }
   };
 
-  // Format level for display
-  const formatLevel = (level: string) => {
-    return level
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
+  const levelOptions = Object.values(ClassLevel).map((level) => ({
+    label: level,
+    value: level,
+  }));
 
   return (
     <Card className="w-full max-w-5xl mx-auto shadow-none">
@@ -75,38 +73,17 @@ const AddClassPage: React.FC = () => {
             />
           </div>
 
-          {/* <div className="space-y-2">
-            <label className="text-sm font-medium">Class Level</label>
-            <Select value={formData.level} onValueChange={handleLevelChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Class Level">
-                  {formatLevel(formData.level)}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(ClassLevel).map((level) => (
-                  <SelectItem key={level} value={level}>
-                    {formatLevel(level)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div> */}
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Class Level</label>
-            <select
-              value={formData.level}
-              onChange={(e) => handleLevelChange(e.target.value)}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {Object.values(ClassLevel).map((level) => (
-                <option key={level} value={level}>
-                  {formatLevel(level)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            options={levelOptions}
+            label="Class level"
+            value={formData.level}
+            onChange={(value) => handleLevelChange(value as string)}
+            placeholder="Class level"
+            searchable={false}
+            clearable={false}
+            className="w-full"
+            changeBg="white"
+          />
 
           <Button
             type="submit"

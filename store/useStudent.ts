@@ -40,7 +40,7 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
   fetchStudents: async (classId: string, sessionId: string) => {
     set({ loading: true, error: null });
     try {
-      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.evict({ fieldName: "gertStudents" });
       client.cache.gc();
       const response = await client.query({
         query: GET_STUDENTS,
@@ -123,6 +123,9 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
           );
         }
 
+        client.cache.evict({ fieldName: "gertStudents" });
+        client.cache.gc();
+
         return newStudentId;
       } else {
         console.error("No student ID returned from mutation.");
@@ -164,6 +167,8 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
               : state.student,
         }));
       }
+      client.cache.evict({ fieldName: "gertStudents" });
+      client.cache.gc();
       return true;
     } catch (error) {
       console.error("Error in updateStudent:", error);
@@ -188,6 +193,9 @@ export const useStudentStore = create<StudentStore>((set, get) => ({
         students: state.students.filter((student) => student.id !== id),
         student: state.student?.id === id ? null : state.student,
       }));
+
+      client.cache.evict({ fieldName: "gertStudents" });
+      client.cache.gc();
 
       return true;
     } catch (error) {

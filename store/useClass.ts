@@ -45,7 +45,7 @@ export const useClassStore = create<ClassStore>((set) => ({
   fetchClasses: async () => {
     set({ loading: true, error: null });
     try {
-      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.evict({ fieldName: "getClasses" });
       client.cache.gc();
       const response = await client.query({
         query: GET_CLASSES,
@@ -99,6 +99,9 @@ export const useClassStore = create<ClassStore>((set) => ({
         variables: { input: formData },
       });
 
+      client.cache.evict({ fieldName: "getClasses" });
+      client.cache.gc();
+
       return data?.createClass?.id || null;
     } catch (error) {
       const errorMessage = errorHandler(error || "Failed to create class");
@@ -129,6 +132,8 @@ export const useClassStore = create<ClassStore>((set) => ({
               : state.class,
         }));
       }
+      client.cache.evict({ fieldName: "getClasses" });
+      client.cache.gc();
       return true;
     } catch (error) {
       set({ error: (error as Error).message || "Failed to update class" });
@@ -151,6 +156,8 @@ export const useClassStore = create<ClassStore>((set) => ({
         classes: state.classes.filter((c) => c.id !== id),
         class: state.class?.id === id ? null : state.class,
       }));
+      client.cache.evict({ fieldName: "getClasses" });
+      client.cache.gc();
       return true;
     } catch (error) {
       set({ error: (error as Error).message || "Failed to delete class" });

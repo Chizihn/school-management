@@ -6,6 +6,7 @@ export interface TeacherInput {
   email: string;
   phone: string;
   gender: Gender;
+  // password: string;
 }
 
 export interface UpdateTeacherInput {

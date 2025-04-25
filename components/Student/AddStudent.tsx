@@ -4,19 +4,12 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import { toast } from "react-toastify";
 import { useStudentStore } from "@/store/useStudent";
 import { Gender } from "@/types/user";
-import { toast } from "react-toastify";
 import { Class, Session } from "@/types/school";
-import { X } from "lucide-react";
 import { capitalizeFirstChar } from "@/utils";
+import CustomSelect from "@/components/ui/CustomSelect"; // Import CustomSelect
 
 interface AddStudentPageProps {
   classes: Class[];
@@ -40,10 +33,12 @@ const AddStudentPage: React.FC<AddStudentPageProps> = ({
   });
 
   const [localLoading, setLocalLoading] = useState(false);
-  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null
-  );
+  const [selectedClassId, setSelectedClassId] = useState<
+    string | number | null
+  >(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<
+    string | number | null
+  >(null);
 
   // Handle form data changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,18 +61,6 @@ const AddStudentPage: React.FC<AddStudentPageProps> = ({
     setFormData((prev) => ({ ...prev, sessionId: value }));
   };
 
-  // Clear class selection
-  const onClearClass = () => {
-    setSelectedClassId(null);
-    setFormData((prev) => ({ ...prev, classId: "" }));
-  };
-
-  // Clear session selection
-  const onClearSession = () => {
-    setSelectedSessionId(null);
-    setFormData((prev) => ({ ...prev, sessionId: "" }));
-  };
-
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +78,17 @@ const AddStudentPage: React.FC<AddStudentPageProps> = ({
       setLocalLoading(false);
     }
   };
+
+  // Map classes and sessions to CustomSelect options
+  const classOptions = classes.map((classItem) => ({
+    label: classItem.name,
+    value: classItem.id,
+  }));
+
+  const sessionOptions = sessions.map((session) => ({
+    label: session.year,
+    value: session.id,
+  }));
 
   return (
     <Card className="w-full max-w-4xl mx-auto shadow-none ">
@@ -146,84 +140,57 @@ const AddStudentPage: React.FC<AddStudentPageProps> = ({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Gender</label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    gender: e.target.value as Gender,
-                  }))
-                }
-                className="w-full p-2 border rounded"
-              >
-                {Object.values(Gender).map((gender) => (
-                  <option key={gender} value={gender}>
-                    {capitalizeFirstChar(gender)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <CustomSelect
+              options={Object.values(Gender).map((gender) => ({
+                label: capitalizeFirstChar(gender),
+                value: gender,
+              }))}
+              value={formData.gender}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  gender: value as Gender,
+                }))
+              }
+              label="Gender"
+              placeholder="Select Gender"
+              className="w-full"
+              changeBg="white"
+              searchable={false}
+              clearable={false}
+            />
           </div>
+
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div className="flex gap-4 w-full">
-              <Select
-                value={selectedClassId || ""}
-                onValueChange={onClassSelect}
-              >
-                <SelectTrigger className="p-6 w-full ">
-                  <SelectValue placeholder="Select Class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map((classItem) => (
-                    <SelectItem key={classItem.id} value={classItem.id}>
-                      {classItem.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Use CustomSelect for Class selection */}
+              <CustomSelect
+                options={classOptions}
+                value={selectedClassId}
+                label="Select class"
+                onChange={(value) => onClassSelect(value as string)}
+                placeholder=""
+                searchable={false}
+                clearable={true}
+                className="w-full"
+                changeBg="white"
+              />
 
-              {selectedClassId && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClearClass}
-                  className="text-red-700"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              )}
-
-              <Select
-                value={selectedSessionId || ""}
-                onValueChange={onSessionSelect}
-              >
-                <SelectTrigger className="py-6 w-full">
-                  <SelectValue placeholder="Select Session" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sessions.map((session) => (
-                    <SelectItem key={session.id} value={session.id}>
-                      {session.year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {selectedSessionId && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClearSession}
-                  className="text-red-700"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              )}
+              {/* Use CustomSelect for Session selection */}
+              <CustomSelect
+                options={sessionOptions}
+                label="Select session"
+                value={selectedSessionId}
+                onChange={(value) => onSessionSelect(value as string)}
+                placeholder=""
+                searchable={false}
+                clearable={true}
+                className="w-full"
+                changeBg="white"
+              />
             </div>
           </div>
+
           <Button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700"

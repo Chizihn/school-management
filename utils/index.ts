@@ -111,3 +111,10 @@ export const convertTo12HourFormat = (time: string) => {
 
   return `${formattedHour}:${minute} ${period}`;
 };
+
+export const formatLevel = (level: string) => {
+  return level
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};

@@ -37,7 +37,7 @@ export const useSessionStore = create<SessionStore>((set) => ({
   fetchSessions: async () => {
     set({ loading: true, error: null });
     try {
-      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.evict({ fieldName: "getSessions" });
       client.cache.gc();
       const response = await client.query({
         query: GET_SESSIONS,
@@ -91,6 +91,9 @@ export const useSessionStore = create<SessionStore>((set) => ({
         variables: { input: formData },
       });
 
+      client.cache.evict({ fieldName: "getSessions" });
+      client.cache.gc();
+
       return data?.createSession?.id || null;
     } catch (error) {
       const errorMessage = errorHandler(error || "Failed to create session");
@@ -121,6 +124,8 @@ export const useSessionStore = create<SessionStore>((set) => ({
               : state.session,
         }));
       }
+      client.cache.evict({ fieldName: "getSessions" });
+      client.cache.gc();
       return true;
     } catch (error) {
       set({ error: (error as Error).message || "Failed to update session" });
@@ -143,6 +148,8 @@ export const useSessionStore = create<SessionStore>((set) => ({
         sessions: state.sessions.filter((s) => s.id !== id),
         session: state.session?.id === id ? null : state.session,
       }));
+      client.cache.evict({ fieldName: "getSessions" });
+      client.cache.gc();
       return true;
     } catch (error) {
       set({ error: (error as Error).message || "Failed to delete session" });

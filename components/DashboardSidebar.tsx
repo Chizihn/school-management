@@ -73,7 +73,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         { title: "All students", path: "/dashboard/students" },
         { title: "Admission form", path: "/dashboard/students/admission" },
         { title: "Student promotion", path: "/dashboard/students/promotion" },
-        { title: "Class", path: "/dashboard/students/class" },
+        { title: "Classes", path: "/dashboard/classes" },
       ],
     },
     {
@@ -111,15 +111,15 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       <div
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transition-transform duration-300 fixed inset-y-0 left-0 z-30 w-64 bg-blue-950 text-white overflow-y-auto flex flex-col`}
+        } lg:translate-x-0 transition-transform duration-300 fixed inset-y-0 left-0 z-30 w-64 bg-blue-950 text-white overflow-hidden flex flex-col`}
       >
         {/* Logo */}
         <div className="flex items-center justify-center p-4 border-b border-blue-900">
           <div className="text-lg font-semibold">Udemy school</div>
         </div>
 
-        {/* Menu items */}
-        <div className="flex-grow">
+        {/* Menu items with max-height and scrolling */}
+        <div className="flex-grow overflow-auto no-scrollbar ">
           {menuItems.map((item, index) => (
             <div key={index} className="px-2 py-1">
               <div
@@ -132,7 +132,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               >
                 <div className="flex items-center">
                   <span className="mr-3">{item.icon}</span>
-                  <span>{item.title}</span>
+                  <span className="truncate">{item.title}</span>
                 </div>
                 <div className="flex items-center">
                   {item.isNew && (
@@ -156,7 +156,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                     <Link
                       key={subIndex}
                       href={subItem.path}
-                      className="block p-2 text-sm text-gray-300 hover:text-white hover:bg-blue-900 rounded-md"
+                      className="block p-2 text-sm text-gray-300 hover:text-white hover:bg-blue-900 rounded-md truncate"
                     >
                       {subItem.title}
                     </Link>

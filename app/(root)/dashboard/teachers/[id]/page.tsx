@@ -1,4 +1,4 @@
-import TeacherDetails from "@/components/TeacherDetails";
+import TeacherDetails from "@/components/Teacher/TeacherDetails";
 
 interface TeacherDetailsPageProps {
   params: Promise<{

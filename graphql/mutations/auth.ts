@@ -42,10 +42,7 @@ export const LOGIN = gql`
           regNo
           dateOfBirth
           regNo
-          guardian {
-            id
-            name
-          }
+
           createdAt
           updatedAt
         }

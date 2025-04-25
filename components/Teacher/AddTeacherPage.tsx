@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useTeacherStore } from "@/store/useTeacher";
 import { Gender } from "@/types/user";
 import { toast } from "react-toastify";
+import TeacherSuccessPage from "./TeacherSuccessPage";
 
 // Utility function to capitalize the first character of a string
 const capitalizeFirstChar = (str: string) => {
@@ -24,7 +25,7 @@ const AddTeacherPage = () => {
 
   const { addTeacherLoading, addTeacher, error } = useTeacherStore();
 
-  const [success, setSuccess] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null);
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +45,7 @@ const AddTeacherPage = () => {
       const newTeacherId = await addTeacher(teacher);
 
       if (newTeacherId) {
-        setSuccess(newTeacherId)
+        setSuccess(newTeacherId);
         // Reset form after successful submission
         setTeacher({
           firstName: "",
@@ -62,13 +63,22 @@ const AddTeacherPage = () => {
     }
   };
 
-  if (success) return <div>
-    <p>
-      Teacher has been added
-    </p>
-  </div>
-
-
+  if (success)
+    return (
+      <TeacherSuccessPage
+        teacherId={success}
+        onAddAnother={() => {
+          setSuccess(null);
+          setTeacher({
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            gender: Gender.MALE,
+          });
+        }}
+      />
+    );
 
   if (error) {
     return <div>Error loading teacher details: {error}</div>;

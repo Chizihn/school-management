@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useStudentStore } from "@/store/useStudent";
 import { useClassStore } from "@/store/useClass";
 import { useSessionStore } from "@/store/useSession";
-import { StudentClassesContainer } from "./StudentClassesContainer";
 import { StudentFilters } from "./StudentFilter";
 import { StudentTable } from "./StudentTable";
 import { ClassCard } from "./ClassCard";
@@ -14,14 +13,19 @@ import { PageLoading } from "../Loader";
 import CenterModal from "../modals/CenterModal";
 import AddStudentPage from "../Student/AddStudent";
 import { useModalStore } from "@/store/useModal";
-import PageHeader from "./PageHeader";
+import PageHeader from "../PageHeader";
 import AddClassPage from "../Class/AddClass";
+import { Button } from "../ui/button";
+import { Book, UserPlus } from "lucide-react";
+import { PageContainer } from "../PageContainer";
 
 const StudentsClassesPage: React.FC = () => {
-  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null
-  );
+  const [selectedClassId, setSelectedClassId] = useState<
+    string | number | null
+  >(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<
+    string | number | null
+  >(null);
 
   const {
     classes,
@@ -45,6 +49,8 @@ const StudentsClassesPage: React.FC = () => {
   const [showStudents, setShowStudents] = useState<boolean>(false);
 
   const {
+    openAddStudentModal,
+    openAddClassModal,
     isAddClassModalOpen,
     closeAddClassModal,
     isAddStudentModalOpen,
@@ -62,9 +68,10 @@ const StudentsClassesPage: React.FC = () => {
   useEffect(() => {
     if (selectedClassId && selectedSessionId) {
       setShowStudents(true);
-      fetchStudents(selectedClassId, selectedSessionId).catch((err) =>
-        console.error("Error fetching students:", err)
-      );
+      fetchStudents(
+        selectedClassId as string,
+        selectedSessionId as string
+      ).catch((err) => console.error("Error fetching students:", err));
     }
   }, [selectedClassId, selectedSessionId, fetchStudents]);
 
@@ -80,25 +87,50 @@ const StudentsClassesPage: React.FC = () => {
 
   return (
     <>
-      <StudentClassesContainer>
-        <PageHeader title="Students & Classes" />
+      <PageContainer>
+        <PageHeader
+          title="Students & Classes"
+          component={
+            <div className="flex gap-3 mt-4 md:mt-0">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => openAddClassModal()}
+              >
+                <Book size={16} />
+                Add Class
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => openAddStudentModal()}
+              >
+                <UserPlus size={16} className="mr-2" />
+                Add Student
+              </Button>
+            </div>
+          }
+        />
 
         <Tabs defaultValue="all-students" className="mb-6">
           <TabsList className="grid grid-cols-4 max-w-xl bg-gray-100">
-            <TabsTrigger value="all-students">All Students</TabsTrigger>
-            <TabsTrigger value="classes">Classes</TabsTrigger>
+            <TabsTrigger value="all-students" className="p-2">
+              All Students
+            </TabsTrigger>
+            <TabsTrigger value="classes" className="p-2">
+              Classes
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="all-students">
             <Card>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="px-2 lg:px-6 pt-6 space-y-4">
                 <StudentFilters
                   classes={classes}
                   sessions={sessions}
                   onClassSelect={setSelectedClassId}
                   onSessionSelect={setSelectedSessionId}
-                  selectedClassId={selectedClassId}
-                  selectedSessionId={selectedSessionId}
+                  selectedClassId={selectedClassId as string}
+                  selectedSessionId={selectedSessionId as string}
                   onClearFilters={handleClearSelections}
                 />
 
@@ -121,7 +153,7 @@ const StudentsClassesPage: React.FC = () => {
             </div>
           </TabsContent>
         </Tabs>
-      </StudentClassesContainer>
+      </PageContainer>
       <CenterModal
         isOpen={isAddClassModalOpen}
         setIsOpen={() => closeAddClassModal()}

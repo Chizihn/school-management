@@ -21,7 +21,7 @@ const EditTeacherPage: React.FC<EditTeacherPageProps> = ({ id }) => {
     error,
     fetchTeacher,
     updateTeacher,
-    updateLoading: loading,
+    updateTeacherLoading: loading,
   } = useTeacherStore();
 
   const [formData, setFormData] = useState<UpdateTeacherInput>({

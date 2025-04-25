@@ -12,6 +12,7 @@ export enum Role {
   TEACHER = "TEACHER",
   STUDENT = "STUDENT",
   GUARDIAN = "GUARDIAN",
+  FORM_TEACHER = "FORM_TEACHER",
 }
 
 // BaseUser Type

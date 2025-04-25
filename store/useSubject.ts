@@ -42,7 +42,7 @@ export const useSubjectStore = create<SubjectStore>((set) => ({
   fetchSubjects: async () => {
     set({ loading: true, error: null });
     try {
-      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.evict({ fieldName: "getSubjects" });
       client.cache.gc();
       const response = await client.query({
         query: GET_SUBJECTS,
@@ -96,6 +96,9 @@ export const useSubjectStore = create<SubjectStore>((set) => ({
         variables: { input: formData },
       });
 
+      client.cache.evict({ fieldName: "getSubjects" });
+      client.cache.gc();
+
       return data?.createSubject?.id || null;
     } catch (error) {
       const errorMessage = errorHandler(error || "Failed to create subject");
@@ -126,6 +129,9 @@ export const useSubjectStore = create<SubjectStore>((set) => ({
               : state.subject,
         }));
       }
+
+      client.cache.evict({ fieldName: "getSubjects" });
+      client.cache.gc();
       return true;
     } catch (error) {
       set({ error: (error as Error).message || "Failed to update subject" });
@@ -148,6 +154,9 @@ export const useSubjectStore = create<SubjectStore>((set) => ({
         subjects: state.subjects.filter((s) => s.id !== id),
         subject: state.subject?.id === id ? null : state.subject,
       }));
+
+      client.cache.evict({ fieldName: "getSubjects" });
+      client.cache.gc();
       return true;
     } catch (error) {
       set({ error: (error as Error).message || "Failed to delete subject" });
@@ -164,6 +173,9 @@ export const useSubjectStore = create<SubjectStore>((set) => ({
           ? { ...subject, teacher: [teacherData] }
           : subject
       );
+
+      client.cache.evict({ fieldName: "getSubjects" });
+      client.cache.gc();
 
       return {
         ...state,

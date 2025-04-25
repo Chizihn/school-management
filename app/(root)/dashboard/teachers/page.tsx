@@ -25,6 +25,7 @@ import CenterModal from "@/components/modals/CenterModal";
 import EditTeacherPage from "@/components/Teacher/EditTeacher";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const AllTeachersPage = () => {
   const { teachers, loading, error, fetchTeachers, deleteTeacher } =
@@ -133,7 +134,14 @@ const AllTeachersPage = () => {
                           className="cursor-pointer"
                           align="end"
                         >
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={`/dashboard/teachers/${teacher.id}`}
+                              className="w-full"
+                            >
+                              View Details
+                            </Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             className="cursor-pointer"
                             onClick={() => {

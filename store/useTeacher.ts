@@ -9,15 +9,19 @@ import {
   DELETE_TEACHER,
   UPDATE_TEACHER,
 } from "@/graphql/mutations/teacher";
+import { toast } from "react-toastify";
 
 interface TeacherStore {
   teachers: Teacher[];
   teacher: Teacher | null;
   loading: boolean;
   teacherLoading: boolean;
-  updateLoading: boolean;
+  addTeacherLoading: boolean;
+  deleteTeacherLoading: boolean;
+  updateTeacherLoading: boolean;
   initialized: boolean;
   error: string | null;
+  setTeacher: (teacher: Teacher) => void;
   fetchTeachers: () => Promise<void>;
   fetchTeacher: (id: string) => Promise<void>;
   addTeacher: (formData: TeacherInput) => Promise<string | null>;
@@ -30,9 +34,15 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
   teacher: null,
   loading: false,
   teacherLoading: false,
-  updateLoading: false,
+  addTeacherLoading: false,
+  deleteTeacherLoading: false,
+  updateTeacherLoading: false,
   initialized: false,
   error: null,
+
+  setTeacher: (teacher: Teacher) => {
+    set({ teacher });
+  },
 
   fetchTeachers: async () => {
     set({ loading: true, error: null });
@@ -99,7 +109,7 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
   },
 
   updateTeacher: async (id: string, input: Partial<Teacher>) => {
-    set({ updateLoading: true, error: null });
+    set({ updateTeacherLoading: true, error: null });
     try {
       const { data } = await client.mutate({
         mutation: UPDATE_TEACHER,
@@ -120,23 +130,25 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
               : state.teacher,
         }));
       }
+      client.cache.evict({ fieldName: "getTeachers" });
+      client.cache.gc();
       return true;
     } catch (error) {
       console.error("Error in updateTeacher:", error);
       set({ error: (error as Error).message || "Failed to update teacher" });
       return false;
     } finally {
-      set({ updateLoading: false });
+      set({ updateTeacherLoading: false });
     }
   },
 
   addTeacher: async (formData: TeacherInput) => {
-    set({ loading: true, error: null });
+    set({ addTeacherLoading: true, error: null });
     try {
       const { data } = await client.mutate({
         mutation: ADD_TEACHER,
         variables: { input: formData },
-        refetchQueries: ["GetTeachers"],
+        refetchQueries: [{ query: GET_TEACHERS }],
       });
 
       if (data?.addTeacher) {
@@ -151,9 +163,14 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
             fetchError
           );
         }
+        toast.success("Teacher added successfully!");
+
+        client.cache.evict({ fieldName: "getTeachers" });
+        client.cache.gc();
 
         return newTeacherId;
       } else {
+        toast.error("Failed to add teacher!");
         console.error("No teacher ID returned from mutation.");
         return null;
       }
@@ -166,12 +183,12 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
       });
       return null;
     } finally {
-      set({ loading: false });
+      set({ addTeacherLoading: false });
     }
   },
 
   deleteTeacher: async (id: string) => {
-    set({ loading: true, error: null });
+    set({ deleteTeacherLoading: true, error: null });
     try {
       await client.mutate({
         mutation: DELETE_TEACHER,
@@ -195,7 +212,7 @@ export const useTeacherStore = create<TeacherStore>((set, get) => ({
       });
       return false;
     } finally {
-      set({ loading: false });
+      set({ deleteTeacherLoading: false });
     }
   },
 }));

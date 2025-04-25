@@ -5,11 +5,11 @@ interface PageContainerProps {
   className?: string;
 }
 
-export const StudentClassesContainer: React.FC<PageContainerProps> = ({
+export const PageContainer: React.FC<PageContainerProps> = ({
   children,
   className = "",
 }) => (
-  <div className={`p-6 bg-gray-50 min-h-screen ${className}`}>
+  <div className={`p-0 lg:p-3 bg-gray-50 min-h-screen ${className}`}>
     <div className="max-w-6xl mx-auto">{children}</div>
   </div>
 );
